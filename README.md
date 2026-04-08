@@ -14,6 +14,25 @@
 
 项目整体定位不是云端群控，而是一个以本地 SQLite + 本地浏览器 + 本地数据目录为核心的受控工作流工具。
 
+## 页面截图
+
+<p align="center">
+  <img src="assets/1.png" alt="页面截图 1" width="48%" />
+  <img src="assets/2.png" alt="页面截图 2" width="48%" />
+</p>
+<p align="center">
+  <img src="assets/3.png" alt="页面截图 3" width="48%" />
+  <img src="assets/4.png" alt="页面截图 4" width="48%" />
+</p>
+<p align="center">
+  <img src="assets/5.png" alt="页面截图 5" width="48%" />
+  <img src="assets/6.png" alt="页面截图 6" width="48%" />
+</p>
+<p align="center">
+  <img src="assets/7.png" alt="页面截图 7" width="48%" />
+  <img src="assets/8.png" alt="页面截图 8" width="48%" />
+</p>
+
 ## 当前实际能力
 
 ### 1. 关键词中心
