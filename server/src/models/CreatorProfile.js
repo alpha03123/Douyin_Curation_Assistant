@@ -1,0 +1,30 @@
+﻿import { createLiteModel } from "../storage/liteModel.js";
+
+export const CreatorProfile = createLiteModel({
+  modelName: "CreatorProfile",
+  tableName: "creator_profiles",
+  uniqueFields: ["creatorKey"],
+  defaults: {
+    creatorKey: "",
+    userUrl: "",
+    userId: "",
+    nickname: "",
+    authorAvatar: "",
+    userDesc: "",
+    keywordSources: [],
+    sampleWorks: [],
+    topKeywords: [],
+    topComments: [],
+    analyzedWorkCount: 0,
+    sampledCommentCount: 0,
+    contentScore: 0,
+    commentKeywordScore: 0,
+    topCommentScore: 0,
+    consistencyScore: 0,
+    totalScore: 0,
+    candidateLevel: "unknown",
+    reviewStatus: "new",
+    reviewNote: "",
+    lastAnalyzedAt: null,
+  },
+});

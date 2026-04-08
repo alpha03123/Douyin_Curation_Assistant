@@ -1,0 +1,27 @@
+{
+  "name": "douyin-curation-assistant",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "predev": "node ./scripts/checkDevPorts.js dev",
+    "dev": "concurrently \"npm run dev --workspace server\" \"npm run dev --workspace client\"",
+    "predev:client": "node ./scripts/checkDevPorts.js client-only",
+    "dev:client": "npm run dev --workspace client",
+    "predev:server": "node ./scripts/checkDevPorts.js server-only",
+    "dev:server": "npm run dev --workspace server",
+    "build": "npm run build --workspace client",
+    "start:server": "npm run start --workspace server",
+    "prepare:browser": "npm run prepare:browser --workspace server",
+    "capture:actions": "npm run capture:actions --workspace server",
+    "lab:watch-browser": "node server/labs/douyin_browser_lab/watchBrowser.js",
+    "lab:watch-browser:all": "node server/labs/douyin_browser_lab/watchBrowser.js --filter all",
+    "lab:extract-actions": "node server/labs/douyin_browser_lab/extractActionSummary.js",
+    "lab:run-action": "node server/labs/douyin_browser_lab/runAction.js"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

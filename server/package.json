@@ -1,0 +1,30 @@
+{
+  "name": "douyin-curation-assistant-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "prepare:browser": "node src/scripts/prepareBrowserSession.js",
+    "capture:actions": "node src/scripts/captureActionRequests.js",
+    "lab:watch-browser": "node labs/douyin_browser_lab/watchBrowser.js",
+    "lab:watch-browser:all": "node labs/douyin_browser_lab/watchBrowser.js --filter all",
+    "lab:extract-actions": "node labs/douyin_browser_lab/extractActionSummary.js",
+    "lab:run-action": "node labs/douyin_browser_lab/runAction.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.8.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "ffmpeg-static": "^5.3.0",
+    "jsrsasign": "^11.1.0",
+    "morgan": "^1.10.0",
+    "playwright-core": "^1.53.2",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
