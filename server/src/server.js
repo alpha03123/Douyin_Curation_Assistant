@@ -12,9 +12,9 @@ async function bootstrap() {
 
   const app = createApp();
   await new Promise((resolve, reject) => {
-    const server = app.listen(env.port, () => {
+    const server = app.listen(env.port, env.host, () => {
       console.log(
-        `[server] listening on http://localhost:${env.port} and connected to SQLite: ${env.sqlitePath}`
+        `[server] listening on http://${env.host}:${env.port} and connected to SQLite: ${env.sqlitePath}`
       );
       resolve();
     });

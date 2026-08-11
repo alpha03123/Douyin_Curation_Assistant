@@ -3,6 +3,7 @@ import express from "express";
 import morgan from "morgan";
 import { env } from "./config/env.js";
 import { errorHandler, notFoundHandler } from "./middlewares/errorHandler.js";
+import { createMcpHttpRouter } from "./mcp/httpRouter.js";
 import apiRouter from "./routes/index.js";
 
 export function createApp() {
@@ -33,6 +34,7 @@ export function createApp() {
   });
 
   app.use("/api/v1", apiRouter);
+  app.use("/mcp", createMcpHttpRouter());
   app.use(notFoundHandler);
   app.use(errorHandler);
 
