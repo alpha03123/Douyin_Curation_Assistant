@@ -39,6 +39,7 @@ const clientOrigins = parseStringList(
 export const env = {
   projectRoot,
   port: Number(process.env.PORT || 3001),
+  host: process.env.HOST || "127.0.0.1",
   dataRoot:
     process.env.DATA_ROOT || path.resolve(projectRoot, "jsonData"),
   sqlitePath:
@@ -58,6 +59,7 @@ export const env = {
   legacyProjectPath:
     process.env.LEGACY_PROJECT_PATH || legacyRoot,
   dyCookies: process.env.DY_COOKIES || "",
+  mcpAuthToken: process.env.MCP_AUTH_TOKEN || "",
   actionBrowserHeadless: parseBoolean(process.env.ACTION_BROWSER_HEADLESS, false),
   actionBrowserKeepOpenOnFailure: parseBoolean(
     process.env.ACTION_BROWSER_KEEP_OPEN_ON_FAILURE,

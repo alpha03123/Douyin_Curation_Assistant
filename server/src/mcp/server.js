@@ -1,6 +1,4 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { pathToFileURL } from "node:url";
 import { z } from "zod";
 import {
   getDouyinLoginStatus,
@@ -131,16 +129,4 @@ export function createDouyinMcpServer() {
   );
 
   return server;
-}
-
-async function main() {
-  const server = createDouyinMcpServer();
-  await server.connect(new StdioServerTransport());
-}
-
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main().catch((error) => {
-    console.error("Failed to start Douyin MCP server:", error);
-    process.exitCode = 1;
-  });
 }

@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
-    "mcp": "node src/mcp/server.js",
     "prepare:browser": "node src/scripts/prepareBrowserSession.js",
     "capture:actions": "node src/scripts/captureActionRequests.js",
     "lab:watch-browser": "node labs/douyin_browser_lab/watchBrowser.js",

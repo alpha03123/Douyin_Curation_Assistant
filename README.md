@@ -128,23 +128,29 @@
 
 ## MCP
 
-项目提供本地 stdio MCP，工具只覆盖抖音的登录状态、关键词搜索、视频评论读取和顶级评论发布：
+项目在现有 Express 服务中提供 Streamable HTTP MCP，工具只覆盖抖音的登录状态、关键词搜索、视频评论读取和顶级评论发布：
 
 - `douyin_get_login_status`
 - `douyin_search_videos`
 - `douyin_get_video_comments`
 - `douyin_post_comment`
 
-首次运行前先执行项目原有的浏览器准备流程，完成抖音登录或在 `.env` 配置 `DY_COOKIES`。随后在 MCP Client 中配置：
+首次运行前先执行项目原有的浏览器准备流程，完成抖音登录或在 `.env` 配置 `DY_COOKIES`。同时设置一个高强度的 `MCP_AUTH_TOKEN`，然后启动后端：
+
+```bash
+npm run start:server
+```
+
+MCP endpoint 为 `http://127.0.0.1:3001/mcp`。在 MCP Client 中配置该 URL，并把 Token 作为 Bearer Authorization Header：
 
 ```json
 {
   "mcpServers": {
     "douyin": {
-      "command": "node",
-      "args": [
-        "E:\\gittools\\self\\medias\\Douyin_Curation_Assistant\\server\\src\\mcp\\server.js"
-      ]
+      "url": "http://127.0.0.1:3001/mcp",
+      "headers": {
+        "Authorization": "Bearer <MCP_AUTH_TOKEN>"
+      }
     }
   }
 }
