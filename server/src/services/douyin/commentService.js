@@ -1,9 +1,9 @@
 import {
   ensureDouyinAuth,
   generateWebId,
-  getSharedDouyinCookieString,
 } from "./auth.js";
 import { buildApiHeaders } from "./headers.js";
+import { resolvePreferredDouyinCookieString } from "./sessionCoordinatorService.js";
 import { generateABogus, spliceUrl } from "./signature.js";
 
 const DOUYIN_URL = "https://www.douyin.com";
@@ -131,8 +131,16 @@ export async function fetchWorkComments({
     throw createHttpError("Aweme ID is required for comment fetching.", 400);
   }
 
-  const auth = ensureDouyinAuth(cookieString || getSharedDouyinCookieString());
   const referer = workUrl || createWorkUrl(awemeId);
+  const resolvedCookieString =
+    cookieString ||
+    (
+      await resolvePreferredDouyinCookieString({
+        targetUrl: referer,
+        synchronizeProfiles: false,
+      })
+    ).cookieString;
+  const auth = ensureDouyinAuth(resolvedCookieString);
   const safeLimit = Math.max(1, Math.min(Number(limit) || 30, 100));
   const pageSize = Math.min(safeLimit, 20);
   const comments = [];
