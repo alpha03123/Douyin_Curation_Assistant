@@ -14,6 +14,7 @@ function parseArgs(argv = []) {
   const options = {
     targetUrl: env.actionCaptureTargetUrl,
     timeoutMs: env.browserLoginTimeoutMs,
+    keepOpen: false,
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -28,6 +29,11 @@ function parseArgs(argv = []) {
     if (arg === "--timeout-ms" && argv[index + 1]) {
       options.timeoutMs = Math.max(60000, Number(argv[index + 1]) || options.timeoutMs);
       index += 1;
+      continue;
+    }
+
+    if (arg === "--keep-open") {
+      options.keepOpen = true;
     }
   }
 
@@ -111,7 +117,9 @@ async function main() {
     console.log("[prepare-browser] Target page:", options.targetUrl);
     console.log("[prepare-browser] Bootstrap page:", bootstrapUrl);
     console.log(
-      `[prepare-browser] Complete login or captcha verification. The browser closes automatically after a session is captured (timeout: ${Math.round(options.timeoutMs / 60000)} minutes).`
+      options.keepOpen
+        ? "[prepare-browser] Browser remains open until you close it."
+        : `[prepare-browser] Complete login or captcha verification. The browser closes automatically after a session is captured (timeout: ${Math.round(options.timeoutMs / 60000)} minutes).`
     );
 
     const sessionCaptured = await waitForLoginSession({
@@ -123,6 +131,11 @@ async function main() {
       throw new Error(
         "No usable Douyin session was captured before the login timeout."
       );
+    }
+
+    if (options.keepOpen) {
+      await context.waitForEvent("close");
+      return;
     }
 
     console.log("[prepare-browser] Login session captured. Closing browser.");
