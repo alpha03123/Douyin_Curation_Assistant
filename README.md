@@ -126,6 +126,32 @@
 - 浏览器自动化：`playwright-core`
 - 下载链路：`Python + yt-dlp + ffmpeg-static`
 
+## MCP
+
+项目提供本地 stdio MCP，工具只覆盖抖音的登录状态、关键词搜索、视频评论读取和顶级评论发布：
+
+- `douyin_get_login_status`
+- `douyin_search_videos`
+- `douyin_get_video_comments`
+- `douyin_post_comment`
+
+首次运行前先执行项目原有的浏览器准备流程，完成抖音登录或在 `.env` 配置 `DY_COOKIES`。随后在 MCP Client 中配置：
+
+```json
+{
+  "mcpServers": {
+    "douyin": {
+      "command": "node",
+      "args": [
+        "E:\\gittools\\self\\medias\\Douyin_Curation_Assistant\\server\\src\\mcp\\server.js"
+      ]
+    }
+  }
+}
+```
+
+`douyin_post_comment` 只在浏览器返回抖音评论 ID 后报告成功。
+
 ## 目录结构
 
 ```text

@@ -6,14 +6,17 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
+    "mcp": "node src/mcp/server.js",
     "prepare:browser": "node src/scripts/prepareBrowserSession.js",
     "capture:actions": "node src/scripts/captureActionRequests.js",
     "lab:watch-browser": "node labs/douyin_browser_lab/watchBrowser.js",
     "lab:watch-browser:all": "node labs/douyin_browser_lab/watchBrowser.js --filter all",
     "lab:extract-actions": "node labs/douyin_browser_lab/extractActionSummary.js",
-    "lab:run-action": "node labs/douyin_browser_lab/runAction.js"
+    "lab:run-action": "node labs/douyin_browser_lab/runAction.js",
+    "test": "node --test test/**/*.test.js"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "better-sqlite3": "^12.8.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
