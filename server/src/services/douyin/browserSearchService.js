@@ -2,6 +2,7 @@ import path from "node:path";
 import { execFile } from "node:child_process";
 import { access, mkdir } from "node:fs/promises";
 import { chromium } from "playwright-core";
+import { env } from "../../config/env.js";
 import { DEFAULT_USER_AGENT } from "./headers.js";
 import { acquireProfileLock } from "./profileLockService.js";
 import { readRuntimeSessionSnapshot } from "./runtimeSessionCacheService.js";
@@ -173,6 +174,63 @@ function isVerificationPage({ url, title, html }) {
     html.includes("verify_check") ||
     html.includes("secsdk-captcha")
   );
+}
+
+async function collectVisibleSearchItems(page, limit) {
+  const items = await page.evaluate((maxItems) => {
+    const seen = new Set();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+
+    return [...document.querySelectorAll('a[href*="/video/"], a[href*="/note/"]')]
+      .map((anchor) => {
+        const href = anchor.href || "";
+        const matched = href.match(/\/(video|note)\/(\d+)/i);
+        if (!matched || seen.has(matched[2])) {
+          return null;
+        }
+
+        const rect = anchor.getBoundingClientRect();
+        const visible =
+          rect.width > 0 &&
+          rect.height > 0 &&
+          rect.bottom > 0 &&
+          rect.right > 0 &&
+          rect.top < viewportHeight &&
+          rect.left < viewportWidth;
+        if (!visible) {
+          return null;
+        }
+
+        seen.add(matched[2]);
+        const card = anchor.closest("li, [data-e2e], [class*='card'], [class*='item']") || anchor;
+        return {
+          awemeId: matched[2],
+          awemeType: matched[1].toLowerCase() === "note" ? 68 : 0,
+          text: (card.innerText || anchor.innerText || "").trim().slice(0, 500),
+        };
+      })
+      .filter(Boolean)
+      .slice(0, maxItems);
+  }, limit);
+
+  return items.map((item) => ({
+    aweme_info: {
+      aweme_id: item.awemeId,
+      aweme_type: item.awemeType,
+      desc: item.text,
+      author: {},
+    },
+  }));
+}
+
+function createDomSearchPayload(items) {
+  return {
+    status_code: 0,
+    data: items,
+    has_more: 0,
+    source: "visible-dom",
+  };
 }
 
 function mergePersistentContextArgs(args = []) {
@@ -422,12 +480,9 @@ export async function searchGeneralWorkPageInBrowser({
   let context = null;
 
   try {
-    // Use a temporary browser context here. The keyword-search fallback must not
-    // mutate the runtime persistent profile, otherwise a failed fallback can
-    // poison the user's healthy verification/login session.
     browser = await chromium.launch({
       executablePath,
-      headless: true,
+      headless: env.searchBrowserHeadless,
     });
     const runtimeSnapshot = await readRuntimeSessionSnapshot().catch(() => null);
     context = await browser.newContext({
@@ -442,8 +497,7 @@ export async function searchGeneralWorkPageInBrowser({
       await context.addCookies(toDouyinBrowserCookies(auth.cookie));
     }
     const page = await context.newPage();
-    const query = String(params?.keyword || "").trim();
-    const desiredCount = Math.max(10, Math.min(Number(params?.count) || 10, 50));
+    const desiredCount = Math.max(1, Math.min(Number(params?.count) || 10, 50));
     const payloadHits = [];
     let lastResponseAt = 0;
 
@@ -490,16 +544,13 @@ export async function searchGeneralWorkPageInBrowser({
         fromBrowserPage: true,
       });
     }
-    if (query) {
-      const searchInput = page.locator('input[type="text"]').first();
-      await searchInput.waitFor({ state: "visible", timeout: 10000 });
-      await searchInput.click({ timeout: 5000 });
-      await searchInput.fill(query, { timeout: 5000 }).catch(() => {});
-      await page.keyboard.press("Enter").catch(() => {});
-    }
-
     const startedAt = Date.now();
     while (Date.now() - startedAt < 20_000) {
+      const visibleItems = await collectVisibleSearchItems(page, desiredCount);
+      if (visibleItems.length > 0) {
+        return createDomSearchPayload(visibleItems);
+      }
+
       const aggregatedItems = [];
       let lastPayload = null;
 

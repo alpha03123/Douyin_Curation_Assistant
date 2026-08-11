@@ -59,6 +59,7 @@ export const env = {
   legacyProjectPath:
     process.env.LEGACY_PROJECT_PATH || legacyRoot,
   dyCookies: process.env.DY_COOKIES || "",
+  searchBrowserHeadless: parseBoolean(process.env.SEARCH_BROWSER_HEADLESS, false),
   actionBrowserHeadless: parseBoolean(process.env.ACTION_BROWSER_HEADLESS, false),
   actionBrowserKeepOpenOnFailure: parseBoolean(
     process.env.ACTION_BROWSER_KEEP_OPEN_ON_FAILURE,
