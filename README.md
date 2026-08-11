@@ -135,22 +135,19 @@
 - `douyin_get_video_comments`
 - `douyin_post_comment`
 
-首次运行前先执行项目原有的浏览器准备流程，完成抖音登录或在 `.env` 配置 `DY_COOKIES`。同时设置一个高强度的 `MCP_AUTH_TOKEN`，然后启动后端：
+首次运行前先执行项目原有的浏览器准备流程，完成抖音登录或在 `.env` 配置 `DY_COOKIES`，然后启动后端：
 
 ```bash
 npm run start:server
 ```
 
-MCP endpoint 为 `http://127.0.0.1:3001/mcp`。在 MCP Client 中配置该 URL，并把 Token 作为 Bearer Authorization Header：
+MCP endpoint 为 `http://127.0.0.1:3001/mcp`，服务默认仅监听本机地址。MCP Client 配置：
 
 ```json
 {
   "mcpServers": {
     "douyin": {
-      "url": "http://127.0.0.1:3001/mcp",
-      "headers": {
-        "Authorization": "Bearer <MCP_AUTH_TOKEN>"
-      }
+      "url": "http://127.0.0.1:3001/mcp"
     }
   }
 }

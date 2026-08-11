@@ -1,8 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-process.env.MCP_AUTH_TOKEN = "test-mcp-token";
-
 const { createApp } = await import("../../src/app.js");
 
 async function startApp() {
@@ -29,28 +27,12 @@ const initializeRequest = {
   },
 };
 
-test("requires a bearer token for MCP requests", async () => {
-  const app = await startApp();
-  try {
-    const response = await fetch(app.url, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(initializeRequest),
-    });
-
-    assert.equal(response.status, 401);
-  } finally {
-    await app.close();
-  }
-});
-
-test("initializes an HTTP MCP session and lists tools", async () => {
+test("initializes a local HTTP MCP session and lists tools", async () => {
   const app = await startApp();
   try {
     const initialized = await fetch(app.url, {
       method: "POST",
       headers: {
-        authorization: "Bearer test-mcp-token",
         accept: "application/json, text/event-stream",
         "content-type": "application/json",
       },
@@ -64,7 +46,6 @@ test("initializes an HTTP MCP session and lists tools", async () => {
     const tools = await fetch(app.url, {
       method: "POST",
       headers: {
-        authorization: "Bearer test-mcp-token",
         accept: "application/json, text/event-stream",
         "content-type": "application/json",
         "mcp-protocol-version": "2025-11-25",
