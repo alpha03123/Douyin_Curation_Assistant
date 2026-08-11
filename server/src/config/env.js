@@ -72,6 +72,10 @@ export const env = {
     15000,
     Number(process.env.ACTION_BROWSER_TIMEOUT_MS || 60000)
   ),
+  browserLoginTimeoutMs: Math.max(
+    60000,
+    Number(process.env.BROWSER_LOGIN_TIMEOUT_MS || 600000)
+  ),
   actionCaptureTargetUrl:
     process.env.ACTION_CAPTURE_TARGET_URL ||
     "https://www.douyin.com/?recommend=1",

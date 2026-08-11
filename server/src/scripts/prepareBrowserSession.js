@@ -13,6 +13,7 @@ import { writeRuntimeSessionSnapshot } from "../services/douyin/runtimeSessionCa
 function parseArgs(argv = []) {
   const options = {
     targetUrl: env.actionCaptureTargetUrl,
+    timeoutMs: env.browserLoginTimeoutMs,
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -21,10 +22,30 @@ function parseArgs(argv = []) {
     if (arg === "--target-url" && argv[index + 1]) {
       options.targetUrl = String(argv[index + 1] || "").trim() || options.targetUrl;
       index += 1;
+      continue;
+    }
+
+    if (arg === "--timeout-ms" && argv[index + 1]) {
+      options.timeoutMs = Math.max(60000, Number(argv[index + 1]) || options.timeoutMs);
+      index += 1;
     }
   }
 
   return options;
+}
+
+async function waitForLoginSession({ flushSnapshot, page, timeoutMs }) {
+  const deadline = Date.now() + timeoutMs;
+
+  while (Date.now() < deadline) {
+    if (await flushSnapshot()) {
+      return true;
+    }
+
+    await page.waitForTimeout(1000);
+  }
+
+  return false;
 }
 
 function toBrowserCookies(cookieMap) {
@@ -53,7 +74,6 @@ async function main() {
     executablePath,
     headless: false,
   });
-  let snapshotTimer = null;
 
   try {
     const existingCookies = await context.cookies("https://www.douyin.com");
@@ -87,24 +107,26 @@ async function main() {
       }).catch(() => null);
     };
 
-    await flushRuntimeSessionSnapshot();
-    snapshotTimer = setInterval(() => {
-      void flushRuntimeSessionSnapshot();
-    }, 2500);
-
     console.log("[prepare-browser] Browser profile directory:", BROWSER_PROFILE_DIR);
     console.log("[prepare-browser] Target page:", options.targetUrl);
     console.log("[prepare-browser] Bootstrap page:", bootstrapUrl);
     console.log(
-      "[prepare-browser] Complete login or captcha verification in the opened browser, then close the browser window."
+      `[prepare-browser] Complete login or captcha verification. The browser closes automatically after a session is captured (timeout: ${Math.round(options.timeoutMs / 60000)} minutes).`
     );
 
-    await context.waitForEvent("close", { timeout: 0 });
-  } finally {
-    if (snapshotTimer) {
-      clearInterval(snapshotTimer);
-      snapshotTimer = null;
+    const sessionCaptured = await waitForLoginSession({
+      flushSnapshot: flushRuntimeSessionSnapshot,
+      page,
+      timeoutMs: options.timeoutMs,
+    });
+    if (!sessionCaptured) {
+      throw new Error(
+        "No usable Douyin session was captured before the login timeout."
+      );
     }
+
+    console.log("[prepare-browser] Login session captured. Closing browser.");
+  } finally {
     if (context.pages().length >= 0) {
       try {
         await context.close();
